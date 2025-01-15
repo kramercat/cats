@@ -17,11 +17,6 @@ console_logger = CustomLogger(
     name="console", log_level=logging.DEBUG, log_to_file=False
 )
 
-# Access the loggers and use them
-discord_logger.get_logger().debug("This is a debug message for the discord logger")
-http_logger.get_logger().info("HTTP request made")
-console_logger.get_logger().info("Bot is running")
-
 # configure discord bot parameters
 intents = discord.Intents.default()
 intents.message_content = True
