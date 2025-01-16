@@ -3,8 +3,10 @@ from discord.ext import commands
 import os
 import logging
 import pathlib
-import re
-from customlogger import CustomLogger
+import utils.datetime_utils as datetime_utils
+from utils.logger_utils import CustomLogger
+from database.db_manager import DatabaseManager
+from database.models.guilds import Guilds
 
 
 # setup logging
@@ -16,6 +18,13 @@ http_logger = CustomLogger(
 console_logger = CustomLogger(
     name="console", log_level=logging.DEBUG, log_to_file=False
 )
+db_logger = CustomLogger(name="database", log_level=logging.DEBUG)
+
+# Initialize the database manager with the path to the database
+pathlib.Path("data").mkdir(exist_ok=True)
+db_manager = DatabaseManager(logger=db_logger)
+db_logger.info(f"Checking if tables exist. Creating if not.")
+db_manager.create_table_if_not_exists(Guilds.table, Guilds.columns)
 
 # configure discord bot parameters
 intents = discord.Intents.default()
@@ -51,6 +60,7 @@ async def load_cogs():
                 discord_logger.info(f"Loaded extension: ({cog_name})")
                 cog = bot.get_cog(cog_name.capitalize())
                 if cog:
+                    # attach logger
                     setattr(cog, "logger", cog_logger)
                     discord_logger.info(f" > Logger attached")
 
@@ -68,10 +78,16 @@ async def load_cogs():
 async def on_guild_join(guild):
     discord_logger.info(f"Joined guild: {guild.name} (ID: {guild.id})")
 
+    # Insert the new guild into the database
+    Guilds.insert_guild(db_manager, guild.id, guild.name)
+
 
 @bot.event
 async def on_guild_remove(guild):
     discord_logger.info(f"Left guild: {guild.name} (ID: {guild.id})")
+
+    # Update the guild's leave_date in the database
+    Guilds.update_guild_leave_date(db_manager, guild.id)
 
 
 @bot.event
