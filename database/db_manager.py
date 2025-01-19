@@ -28,31 +28,28 @@ class DatabaseManager:
         self.logger.info(f" > Params: {params}")
         self.logger.info(f" > Commit: {commit}")
         try:
-            conn = self._get_db_connection()
-            cursor = conn.cursor()
-            cursor.execute(query, params)
-            if commit:
-                conn.commit()
-            result = cursor.fetchall()
-            conn.close()
-            self.logger.info(f" > Result: {result}")
-            return result
+            with self._get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, params)
+                if commit:
+                    conn.commit()
+                result = cursor.fetchall()
+                self.logger.info(f" > Result: {result}")
+                return result
         except Exception as e:
             self.logger.error(e)
+            return []
 
     def _initialize_database(self):
         """Ensure the database is set up (tables created) when the program starts."""
         # Create the database file if it doesn't exist
         if not os.path.exists(self.db_path):
-            self.logger.info(
-                f"Database file {self.db_path} not found. It will be created."
-            )
+            pathlib.Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+            open(self.db_path, "a").close()
+        self.logger.info("Checking if tables exist. Creating if not.")
 
     def create_table_if_not_exists(self, table_name: str, columns: List[str]) -> None:
         """Create the table if it does not exist."""
-        # Just in case the .db file doesn't exist at all
-        pathlib.Path("data").mkdir(exist_ok=True)
-
         # Check if the table already exists in the database
         self.logger.info(f"Checking if tables exist. Creating if not.")
         query = (
