@@ -19,6 +19,7 @@ class Facts(CustomCog):
         interaction : discord.Interaction
 
         """
+        await interaction.response.defer(thinking=True)
         url = "https://catfact.ninja/fact"
         try:
             async with aiohttp.ClientSession() as session:
@@ -26,19 +27,18 @@ class Facts(CustomCog):
                 async with session.get(url) as response:
                     if response.status == 200:
                         data = await response.json()
-                        cat_fact = data["fact"]
-                        msg = await interaction.response.send_message(cat_fact)
-                        await msg.delete(delay=60)
+                        text = data["fact"]
                         self.logger.info(" > Delivering cat fact")
-
                     else:
-                        await interaction.response.send_message(
-                            "Something went wrong.", delete_after=10
-                        )
+                        text = "Something went wrong."
                         self.logger.error(" > Bad response.")
+            self.logger.info(" > Fact delivered. Self-destructing in 15 seconds.")
         except Exception as e:
-            await interaction.response.send_message(f"Error.", delete_after=10)
-            self.logger.error(f" > Error: {e}")
+            text = f"Error: {e}"
+            self.logger.error(f" > {text}")
+
+        msg = await interaction.followup.send(text)
+        await msg.delete(delay=15)
 
 
 async def setup(bot: commands.Bot):
