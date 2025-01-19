@@ -3,8 +3,14 @@ import utils.datetime_utils as datetime_utils
 
 
 class Guilds(BaseModel):
-    table = "guilds"
-    columns = ["guild_id", "guild_name", "join_date", "leave_date"]
+    class Meta:
+        table = "guilds"
+        columns = {
+            "guild_id": "TEXT",
+            "guild_name": "TEXT",
+            "join_date": "DATETIME",
+            "leave_date": "DATETIME",
+        }
 
     @classmethod
     def insert_guild(cls, guild_id: int, guild_name: str):
@@ -24,7 +30,3 @@ class Guilds(BaseModel):
         set_values = {"leave_date": datetime_utils.now()}
         where_values = {"guild_id": guild_id}
         cls.update(set_values, where_values)
-
-
-# Initialize the table when the model is defined
-Guilds.initialize(Guilds.table, Guilds.columns)

@@ -1,22 +1,22 @@
 import discord
-
 from database.base_model import BaseModel
 import utils.datetime_utils as datetime_utils
 
 
 class Commands(BaseModel):
-    table = "commands"
-    columns = [
-        "date",
-        "guild_id",
-        "guild_name",
-        "user_id",
-        "user_name",
-        "command_name",
-        "comamnd_args",
-        "channel_id",
-        "channel_name",
-    ]
+    class Meta:
+        table = "commands"
+        columns = {
+            "date": "DATETIME",
+            "guild_id": "TEXT",
+            "guild_name": "TEXT",
+            "user_id": "TEXT",
+            "user_name": "TEXT",
+            "command_name": "TEXT",
+            "command_args": "TEXT",
+            "channel_id": "TEXT",
+            "channel_name": "TEXT",
+        }
 
     @classmethod
     def log_command(cls, interaction: discord.Interaction):
@@ -33,7 +33,3 @@ class Commands(BaseModel):
             "channel_name": interaction.channel.name,
         }
         cls.create(values)
-
-
-# Initialize the table when the model is defined
-Commands.initialize(Commands.table, Commands.columns)

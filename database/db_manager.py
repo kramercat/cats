@@ -59,17 +59,8 @@ class DatabaseManager:
 
         if not result:
             # Table does not exist, create it
-            self.logger.info(f"Creating table ({table_name}) with {columns}...")
-
-            # Modify this part to set datetime fields explicitly
-            columns_definition = []
-            for col in columns:
-                if "date" in col.lower():
-                    columns_definition.append(f"{col} DATETIME")
-                else:
-                    columns_definition.append(f"{col} TEXT")
-
-            # Create the table with appropriate column types
+            self.logger.info(f"Creating table ({table_name}) with columns {columns}...")
+            columns_definition = [f"{col} {dtype}" for col, dtype in columns.items()]
             create_table_query = (
                 f"CREATE TABLE {table_name} ({', '.join(columns_definition)})"
             )

@@ -2,30 +2,36 @@ from typing import List, Dict, Any
 from database.db_manager import DatabaseManager
 
 
-class BaseModel:
+class ModelMeta(type):
+    def __new__(cls, name, bases, attrs):
+        new_class = super().__new__(cls, name, bases, attrs)
+        if "Meta" in attrs:
+            meta = attrs["Meta"]
+            table = getattr(meta, "table", None)
+            columns = getattr(meta, "columns", None)
+            if table and columns:
+                new_class.table = table
+                new_class.columns = columns
+                new_class.db_manager = DatabaseManager()
+                new_class.db_manager.create_table_if_not_exists(table, columns)
+        return new_class
+
+
+class BaseModel(metaclass=ModelMeta):
     table: str
-    columns: List[str]
-    # Initialize the database manager with the path to the database
+    columns: Dict[str, str]
     db_manager = DatabaseManager()
 
     @classmethod
-    def initialize(cls, table: str, columns: List[str]) -> None:
+    def initialize(cls, table: str, columns: Dict[str, str]) -> None:
         cls.table = table
         cls.columns = columns
         cls.db_manager.create_table_if_not_exists(cls.table, cls.columns)
 
     @classmethod
-    def _get_column_names(cls) -> List[str]:
-        return cls.columns
-
-    @classmethod
-    def _get_table_name(cls) -> str:
-        return cls.table
-
-    @classmethod
     def create(cls, values: Dict[str, Any]) -> None:
         """Insert a new record into the database using the db_manager."""
-        cls.db_manager.create(cls.table, cls.columns, values)
+        cls.db_manager.create(cls.table, list(cls.columns.keys()), values)
 
     @classmethod
     def fetch_all(cls) -> List[tuple]:
