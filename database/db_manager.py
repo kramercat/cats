@@ -1,12 +1,19 @@
 import sqlite3
 from typing import List, Dict, Any
 import os
+import pathlib
+import logging
+from utils.logger_utils import CustomLogger
 
 
 class DatabaseManager:
-    def __init__(self, db_path: str = None, logger=None):
+    def __init__(
+        self,
+        db_path: str = None,
+        logger: CustomLogger = None,
+    ):
         self.db_path = db_path or os.getenv("DB_PATH", "data/database.db")
-        self.logger = logger
+        self.logger = logger or CustomLogger(name="database", log_level=logging.DEBUG)
         self._initialize_database()
 
     def _get_db_connection(self) -> sqlite3.Connection:
@@ -43,7 +50,11 @@ class DatabaseManager:
 
     def create_table_if_not_exists(self, table_name: str, columns: List[str]) -> None:
         """Create the table if it does not exist."""
+        # Just in case the .db file doesn't exist at all
+        pathlib.Path("data").mkdir(exist_ok=True)
+
         # Check if the table already exists in the database
+        self.logger.info(f"Checking if tables exist. Creating if not.")
         query = (
             f"SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}'"
         )

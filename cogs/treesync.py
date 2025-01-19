@@ -18,9 +18,6 @@ class Treesync(commands.Cog):
         interaction : discord.Interaction
 
         """
-        self.logger.info(
-            f"Guild ({interaction.guild_id}) ({interaction.user}) called {__name__}"
-        )
         await interaction.response.send_message(
             " > Syncing app commands...", delete_after=15
         )
