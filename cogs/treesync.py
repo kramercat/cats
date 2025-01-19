@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from utils.custom_cog import CustomCog
 
 
-class Treesync(commands.Cog):
+class Treesync(CustomCog):
     def __init__(self, bot, logger=None):
         self.bot = bot
         self.logger = logger
