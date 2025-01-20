@@ -1,5 +1,6 @@
 import discord
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 import utils.datetime_utils as datetime_utils
 from database.base_model import BaseModel, Base
 
@@ -8,14 +9,15 @@ class Commands(Base, BaseModel):
     __tablename__ = "commands"
     id = Column(Integer, primary_key=True)
     date = Column(DateTime(timezone=True))
-    guild_id = Column(String)
-    guild_name = Column(String)
+    guild_id = Column(Integer, ForeignKey("guilds.guild_id"))
     user_id = Column(String)
     user_name = Column(String)
     command_name = Column(String)
     command_args = Column(String)
     channel_id = Column(String)
     channel_name = Column(String)
+
+    guild = relationship("Guilds", back_populates="commands")
 
     @classmethod
     def log_command(cls, interaction: discord.Interaction):
@@ -24,7 +26,6 @@ class Commands(Base, BaseModel):
         command = cls(
             date=datetime_utils.now(),
             guild_id=interaction.guild_id,
-            guild_name=interaction.guild.name,
             user_id=interaction.user.id,
             user_name=interaction.user.name,
             command_name=interaction.command.name,

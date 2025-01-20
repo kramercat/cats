@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime
 import utils.datetime_utils as datetime_utils
 from database.base_model import BaseModel, Base
+from sqlalchemy.orm import relationship
 
 
 class Guilds(Base, BaseModel):
@@ -9,6 +10,8 @@ class Guilds(Base, BaseModel):
     guild_name = Column(String)
     join_date = Column(DateTime(timezone=True))
     leave_date = Column(DateTime(timezone=True), nullable=True)
+
+    commands = relationship("Commands", back_populates="guild")
 
     @classmethod
     def insert_guild(cls, guild_id: int, guild_name: str):
