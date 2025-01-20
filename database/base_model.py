@@ -1,32 +1,20 @@
 from typing import List, Dict, Any
+from sqlalchemy.ext.declarative import declarative_base
 from database.db_manager import DatabaseManager
 
-
-class ModelMeta(type):
-    def __new__(cls, name, bases, attrs):
-        new_class = super().__new__(cls, name, bases, attrs)
-        if "Meta" in attrs:
-            meta = attrs["Meta"]
-            table = getattr(meta, "table", None)
-            columns = getattr(meta, "columns", None)
-            if table and columns:
-                new_class.table = table
-                new_class.columns = columns
-                new_class.db_manager = DatabaseManager()
-                new_class.db_manager.create_table_if_not_exists(table, columns)
-        return new_class
+Base = declarative_base()
 
 
-class BaseModel(metaclass=ModelMeta):
-    table: str
-    columns: Dict[str, str]
+class BaseModel:
     db_manager = DatabaseManager()
 
+    @property
+    def session(cls):
+        return cls.db_manager.get_session()
+
     @classmethod
-    def initialize(cls, table: str, columns: Dict[str, str]) -> None:
-        cls.table = table
-        cls.columns = columns
-        cls.db_manager.create_table_if_not_exists(cls.table, cls.columns)
+    def initialize(cls, base):
+        cls.db_manager.initialize_database(base)
 
     @classmethod
     def create(cls, values: Dict[str, Any]) -> None:

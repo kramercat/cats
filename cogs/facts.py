@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 import aiohttp
 from utils.custom_cog import CustomCog
+from database.base_model import BaseModel, Base
 
 
 class Facts(CustomCog):
@@ -42,4 +43,5 @@ class Facts(CustomCog):
 
 
 async def setup(bot: commands.Bot):
+    BaseModel.initialize(Base)  # Ensure tables are created
     await bot.add_cog(Facts(bot))
