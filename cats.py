@@ -12,11 +12,11 @@ from database.models.guilds import Guilds
 pathlib.Path("logs").mkdir(exist_ok=True)
 discord_logger = CustomLogger(name="discord", log_level=logging.DEBUG)
 http_logger = CustomLogger(
-    name="discord.http", log_level=logging.INFO, log_to_console=False
+    name="discord.http", log_level=logging.DEBUG, log_to_console=False
 )
-console_logger = CustomLogger(
-    name="console", log_level=logging.DEBUG, log_to_file=False
-)
+logging.getLogger("discord.http").setLevel(logging.DEBUG)
+logging.getLogger("discord.http").addHandler(http_logger.file_handler())
+console_logger = CustomLogger(name="console", log_level=logging.DEBUG, log_to_file=True)
 
 # configure discord bot parameters
 intents = discord.Intents.default()
