@@ -90,20 +90,26 @@ class CustomLogger(logging.Logger):
 
         # Set up the console handler (if enabled)
         if self.log_to_console:
-            console_handler = logging.StreamHandler()
-            console_handler.setFormatter(self._get_formatter())
-            self.addHandler(console_handler)
+            self.addHandler(self.console_handler())
 
         # Set up the rotating file handler (if enabled)
         if self.log_to_file:
-            file_handler = TimedRotatingFileHandler(
-                filename=self.log_file,
-                encoding="utf-8",
-                when=self.when,
-                backupCount=self.backup_count,
-            )
-            file_handler.setFormatter(self._get_formatter())
-            self.addHandler(file_handler)
+            self.addHandler(self.file_handler())
+
+    def console_handler(self):
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(self._get_formatter())
+        return console_handler
+
+    def file_handler(self):
+        file_handler = TimedRotatingFileHandler(
+            filename=self.log_file,
+            encoding="utf-8",
+            when=self.when,
+            backupCount=self.backup_count,
+        )
+        file_handler.setFormatter(self._get_formatter())
+        return file_handler
 
     def _get_formatter(self):
         """

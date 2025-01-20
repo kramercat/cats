@@ -13,6 +13,11 @@ class DatabaseManager:
         self.logger = logger or CustomLogger(
             name="sqlalchemy.engine", log_level=logging.DEBUG
         )
+        # Set the custom logger for SQLAlchemy's 'sqlalchemy.engine' logger
+        logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
+        logging.getLogger("sqlalchemy.engine").addHandler(self.logger.console_handler())
+        logging.getLogger("sqlalchemy.engine").addHandler(self.logger.file_handler())
+
         self.engine = create_engine(self.db_path, echo=True)
         self.Session = sessionmaker(bind=self.engine)
 
