@@ -54,7 +54,7 @@ async def load_cogs():
                 if cog:
                     # attach logger
                     setattr(cog, "logger", cog_logger)
-                    discord_logger.info(f" > Logger attached")
+                    discord_logger.info(f" - Logger attached")
 
             except Exception as e:
                 discord_logger.error(e)

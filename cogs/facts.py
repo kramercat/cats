@@ -24,22 +24,23 @@ class Facts(CustomCog):
         url = "https://catfact.ninja/fact"
         try:
             async with aiohttp.ClientSession() as session:
-                self.logger.info(" > Getting cat fact...")
+                self.logger.info(" - Getting cat fact...")
                 async with session.get(url) as response:
                     if response.status == 200:
                         data = await response.json()
                         text = data["fact"]
-                        self.logger.info(" > Delivering cat fact")
+                        self.logger.info(" - Delivering cat fact")
                     else:
                         text = "Something went wrong."
-                        self.logger.error(" > Bad response.")
-            self.logger.info(" > Fact delivered. Self-destructing in 15 seconds.")
+                        self.logger.error(" - Bad response.")
+            self.logger.info(" - Fact delivered. Self-destructing in 15 seconds.")
         except Exception as e:
             text = f"Error: {e}"
-            self.logger.error(f" > {text}")
+            self.logger.error(f" - {text}")
 
         msg = await interaction.followup.send(text)
         await msg.delete(delay=15)
+        self.log_command_end()
 
 
 async def setup(bot: commands.Bot):

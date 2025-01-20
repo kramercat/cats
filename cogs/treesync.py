@@ -20,10 +20,11 @@ class Treesync(CustomCog):
 
         """
         await interaction.response.defer(thinking=True, ephemeral=True)
-        msg = await interaction.followup.send(" > Syncing app commands...")
+        msg = await interaction.followup.send(" - Syncing app commands...")
         await self.bot.tree.sync()
-        await msg.edit(content=" > App commands synced. Self-destructing.")
+        await msg.edit(content=" - App commands synced. Self-destructing.")
         await msg.delete(delay=5)
+        self.log_command_end()
 
 
 async def setup(bot: commands.Bot):

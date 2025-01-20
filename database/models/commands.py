@@ -7,7 +7,7 @@ from database.base_model import BaseModel, Base
 class Commands(Base, BaseModel):
     __tablename__ = "commands"
     id = Column(Integer, primary_key=True)
-    date = Column(DateTime(timezone=True), default=datetime_utils.now())
+    date = Column(DateTime(timezone=True))
     guild_id = Column(String)
     guild_name = Column(String)
     user_id = Column(String)
@@ -22,6 +22,7 @@ class Commands(Base, BaseModel):
         """Log a command interaction."""
         session = cls.db_manager.get_session()
         command = cls(
+            date=datetime_utils.now(),
             guild_id=interaction.guild_id,
             guild_name=interaction.guild.name,
             user_id=interaction.user.id,

@@ -115,7 +115,7 @@ class CustomLogger(logging.Logger):
             The formatter for the log message.
         """
         return logging.Formatter(
-            "[{asctime}] [{levelname:6}] <{name}> {filename}:{lineno} ~ {message}",
+            "[{asctime}] [{levelname:6}] <{name}> {filename}:{lineno} {message}",
             "%Y-%m-%d %H:%M:%S",
             style="{",
         )
